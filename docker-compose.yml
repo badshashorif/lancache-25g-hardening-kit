@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  dns:
+    image: lancachenet/lancache-dns:latest
+    container_name: lancache_dns
+    env_file: .env
+    restart: always
+    ports:
+      - "${DNS_BIND_IP}:53:53/udp"
+      - "${DNS_BIND_IP}:53:53/tcp"
+    volumes:
+      - "${DATA_ROOT}/bind:/etc/bind"
+    networks:
+      lancache_net:
+        ipv4_address: 172.21.0.5
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  monolithic:
+    image: lancachenet/monolithic:latest
+    container_name: lancache_monolithic
+    env_file: .env
+    restart: always
+    network_mode: host
+    ulimits:
+      nofile:
+        soft: 200000
+        hard: 200000
+    volumes:
+      - "${CACHE_ROOT}/cache:/data/cache"
+      - "/var/log/lancache/logs:/data/logs"
+      - "${DATA_ROOT}/nginx:/etc/nginx"
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+networks:
+  lancache_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "9200"
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

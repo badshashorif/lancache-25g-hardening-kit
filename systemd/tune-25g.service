@@ -1,0 +1,12 @@
+[Unit]
+Description=Tune 25G NIC (offload/RSS/IRQ/RPS/MTU)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/tune-25g.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

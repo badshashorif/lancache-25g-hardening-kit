@@ -1,0 +1,11 @@
+[Unit]
+Description=Set THP to madvise and disable proactive compaction
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo madvise > /sys/kernel/mm/transparent_hugepage/enabled; echo madvise > /sys/kernel/mm/transparent_hugepage/defrag; echo 0 > /proc/sys/vm/compaction_proactiveness'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
